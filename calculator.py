@@ -174,12 +174,13 @@ class CalculatorApp:
 
         history_frame = ttk.Frame(self.root, padding=(8, 0, 8, 8))
         history_frame.grid(row=1, column=0, columnspan=4, sticky="nsew")
+        history_frame.grid_rowconfigure(0, weight=0)
 
         history_title = ttk.Label(history_frame, text="History", font=("Segoe UI", 11, "bold"))
         history_title.pack(anchor="w")
 
-        self.history_listbox = tk.Listbox(history_frame, height=4, font=("Segoe UI", 10), activestyle="none")
-        self.history_listbox.pack(fill="both", expand=True, pady=(4, 6))
+        self.history_listbox = tk.Listbox(history_frame, height=3, font=("Segoe UI", 10), activestyle="none")
+        self.history_listbox.pack(fill="both", expand=False, pady=(4, 6))
         self.history_listbox.bind("<<ListboxSelect>>", self._on_history_select)
         self.history_listbox.bind("<Double-Button-1>", self._replay_selected_history)
 
@@ -191,7 +192,7 @@ class CalculatorApp:
         self.scientific_toggle.pack(fill="x", pady=(6, 4))
 
         self.scientific_frame = ttk.Frame(history_frame)
-        self.scientific_frame.pack(fill="x")
+        self.scientific_frame.pack(fill="x", pady=(0, 6))
         self.scientific_frame.pack_forget()
 
         scientific_buttons = [
@@ -201,12 +202,12 @@ class CalculatorApp:
             ("√", lambda: self.append_text("sqrt(")),
             ("π", lambda: self.append_text("pi")),
             ("e", lambda: self.append_text("e")),
+            ("^", lambda: self.append_text("^")),
             ("(", lambda: self.append_text("(")),
             (")", lambda: self.append_text(")")),
-            ("^", lambda: self.append_text("^")),
         ]
         for index, (label, command) in enumerate(scientific_buttons):
-            ttk.Button(self.scientific_frame, text=label, command=command).grid(row=0, column=index, padx=2, pady=2, sticky="ew")
+            ttk.Button(self.scientific_frame, text=label, command=command, width=6).grid(row=0, column=index, padx=2, pady=2, sticky="ew")
         for index in range(len(scientific_buttons)):
             self.scientific_frame.grid_columnconfigure(index, weight=1)
 
@@ -234,6 +235,7 @@ class CalculatorApp:
             self.root.grid_columnconfigure(i, weight=1)
         for i in range(1, 8):
             self.root.grid_rowconfigure(i, weight=1)
+        self.root.geometry("360x620")
 
         self.root.grid_rowconfigure(0, weight=0)
 
@@ -309,6 +311,7 @@ class CalculatorApp:
     def clear_all(self) -> None:
         self.expression = ""
         self.display_var.set("0")
+        self.history_listbox.selection_clear(0, tk.END)
 
     def backspace(self) -> None:
         self.clear_entry()
@@ -324,6 +327,9 @@ class CalculatorApp:
 
     def clear_history(self) -> None:
         self.history.clear()
+        self.expression = ""
+        self.display_var.set("0")
+        self.history_listbox.selection_clear(0, tk.END)
         self._refresh_history()
 
     def _refresh_history(self) -> None:

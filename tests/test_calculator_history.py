@@ -1,4 +1,6 @@
-from calculator import CalculatorHistory
+import tkinter as tk
+
+from calculator import CalculatorApp, CalculatorHistory
 
 
 def test_add_entry_and_retrieve():
@@ -22,3 +24,17 @@ def test_clear_history_removes_all_entries():
     history.clear()
 
     assert history.get_entries() == []
+
+
+def test_clear_history_clears_listbox_selection():
+    root = tk.Tk()
+    app = CalculatorApp(root)
+    app.history.add_entry("2+2", "4")
+    app._refresh_history()
+    app.history_listbox.selection_set(0)
+
+    app.clear_history()
+
+    assert app.history.get_entries() == []
+    assert app.history_listbox.curselection() == ()
+    root.destroy()
